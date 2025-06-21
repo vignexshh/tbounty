@@ -25,6 +25,22 @@ export default function PostBounty(props: PostBountyProps) {
     const [bountytitle, setBountyTitle]  = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append("title", bountytitle);
+        formData.append("description", description);
+        formData.append("price", price);
+
+        await fetch("/api/bounty", {
+            method: "POST",
+            body:formData
+        });
+    };
     
     
 
@@ -94,7 +110,9 @@ export default function PostBounty(props: PostBountyProps) {
 
         </div>
         <DialogFooter className="sm:justify-start">
-          <Button>
+          <Button 
+          onClick={handleSubmit}
+          disabled={!bountytitle || !description || !price}>
             <IconBrandTelegram />
             Post Bounty
           </Button>

@@ -36,7 +36,7 @@ export default function PostBounty(props: PostBountyProps) {
         formData.append("description", description);
         formData.append("price", price);
 
-        await fetch("/api/bounty", {
+        await fetch("/api/post/submit-bounty", {
             method: "POST",
             body:formData
         });
@@ -111,7 +111,10 @@ export default function PostBounty(props: PostBountyProps) {
         </div>
         <DialogFooter className="sm:justify-start">
           <Button 
-          onClick={handleSubmit}
+          onClick={e => {
+            console.log("Submitting bounty:", { bountytitle, description, price });
+            handleSubmit(e);
+          }}
           disabled={!bountytitle || !description || !price}>
             <IconBrandTelegram />
             Post Bounty

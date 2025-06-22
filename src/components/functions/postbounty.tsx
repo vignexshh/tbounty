@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-import { IconBrandTelegram } from "@tabler/icons-react";
+import { IconBrandTelegram, IconCheck } from "@tabler/icons-react";
 import { Loader2Icon } from "lucide-react"
 
 type PostBountyProps = {};
@@ -42,13 +42,16 @@ export default function PostBounty(props: PostBountyProps) {
 
 
 
+        setSubmitState("submitting");
         try {
             await fetch("/api/post/submit-bounty", {
-                method: "POST",
-                body: formData,
+            method: "POST",
+            body: formData,
             });
-            setSubmitState("submitted");
-            setTimeout(() => setSubmitState("idle"), 1500);
+            setTimeout(() => setSubmitState("submitted"), 2000)
+
+            // setSubmitState("submitted");
+            // setTimeout(() => setSubmitState("idle"), 3300);
         } catch (error) {
             setSubmitState("error"); // or add error state if needed
         }
@@ -77,7 +80,7 @@ export default function PostBounty(props: PostBountyProps) {
                             id="bountyTitle"
                             placeholder="eg. Design a shopping bag artwork"
                             value={bountytitle}
-                            onChange={e => setBountyTitle(e.target.value)}
+                            onChange={e => { setBountyTitle(e.target.value); setSubmitState("idle"); }}
 
                         />
                     </div>
@@ -87,7 +90,7 @@ export default function PostBounty(props: PostBountyProps) {
                         </Label>
                         <Textarea placeholder="Bounty Description goes here"
                             value={description}
-                            onChange={e => setDescription(e.target.value)} />
+                            onChange={e => {setDescription(e.target.value); setSubmitState("idle")}} />
                     </div>
 
                     <div className="grid gap-3">
@@ -103,7 +106,7 @@ export default function PostBounty(props: PostBountyProps) {
                             placeholder="Enter amount in INR"
                             inputMode="decimal"
                             value={price}
-                            onChange={e => setPrice(e.target.value)}
+                            onChange={e => {setPrice(e.target.value); setSubmitState("idle")}}
                         />
                     </div>
 
@@ -124,13 +127,15 @@ export default function PostBounty(props: PostBountyProps) {
                 <DialogFooter className="sm:justify-start">
                     <Button
                         onClick={e => { setIsSubmitting(true); handleSubmit(e); }}
-                        disabled={!bountytitle || !description || !price }
+                        disabled={!bountytitle || !description || !price  || submitState === "submitted" }
                     >
                         {submitState === "idle" && <IconBrandTelegram />}
                         {submitState === "submitting" && <Loader2Icon className="animate-spin" />}
+                        {submitState === "submitted" && <IconCheck/>}
                         {/* {isSubmitting && <Loader2Icon className="animate-spin" />} */}
 
                         Post Bounty
+                        
                     </Button>
                     <DialogClose asChild>
                         <Button type="button" variant="secondary">

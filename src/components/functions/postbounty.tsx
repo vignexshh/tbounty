@@ -60,7 +60,16 @@ export default function PostBounty(props: PostBountyProps) {
 
 
     return (
-        <Dialog>
+        <Dialog 
+            onOpenChange={open => {
+                if (!open){
+
+                    setSubmitState('idle')
+
+
+                }
+            }}>
+
             <DialogTrigger asChild>
                 <Button>Post Bounty</Button>
             </DialogTrigger>
@@ -134,7 +143,7 @@ export default function PostBounty(props: PostBountyProps) {
                         {submitState === "submitted" && <IconCheck/>}
                         {/* {isSubmitting && <Loader2Icon className="animate-spin" />} */}
 
-                        Post Bounty
+                        {submitState === "submitted" ? "Bounty Posted" : "Post Bounty"}
                         
                     </Button>
                     <DialogClose asChild>

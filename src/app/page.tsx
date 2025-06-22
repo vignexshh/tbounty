@@ -14,14 +14,17 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import PostBounty from "@/components/functions/postbounty";
+import PostBounty from "@/components/functions/PostBounty";
 
 import { IconBrandTelegram } from "@tabler/icons-react";
 
+import ProfileHotDispay from "@/components/dashboard/ProfileHotDispay";
+
 export default function Home() {
   return (
-
-    <PostBounty/>
+    <div style={{ backgroundColor: "#F4F2EE", minHeight: "100vh", width: "100vw" }}>
+      <ProfileHotDispay />
+    </div>
 
   );
 }

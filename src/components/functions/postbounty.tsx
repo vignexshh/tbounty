@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 import { IconBrandTelegram, IconCheck } from "@tabler/icons-react";
-import { Loader2Icon } from "lucide-react"
+import { IconLoaderQuarter } from "@tabler/icons-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 
@@ -31,6 +31,13 @@ export default function PostBounty(props: PostBountyProps) {
     const [price, setPrice] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitState, setSubmitState] = useState<"idle" | "submitting" | "submitted" | "error">("idle");
+    const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        if (submitState === "submitted") {
+            setTimeout(() => setOpen(false), 1200); // closes after 1.2s
+        }
+    }, [submitState]);
 
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -72,14 +79,17 @@ export default function PostBounty(props: PostBountyProps) {
 
     return (
         <Dialog
-            onOpenChange={open => {
-                if (!open) {
-                    setTimeout(() => setSubmitState("idle"), 1000)
+            open={open}
+            onOpenChange={o => {
+                setOpen(o);
+                if (!o) {
+                    setTimeout(() => setSubmitState("idle"), 1000);
                 }
-            }}>
+            }}
+        >
 
             <DialogTrigger asChild>
-                <Button>Post Bounty</Button>
+                <Button onClick={() => setOpen(true)}>Post Bounty</Button>
             </DialogTrigger>
             <DialogContent className={`sm:max-w-md ${submitState === "error" ? "shake" : ""}`}>
                 <DialogHeader>
@@ -159,10 +169,10 @@ export default function PostBounty(props: PostBountyProps) {
                         disabled={!bountytitle || !description || !price || submitState === "submitted"}
                     >
                         {(submitState === "idle" || submitState === "error") && <IconBrandTelegram />}
-                        {submitState === "submitting" && <Loader2Icon className="animate-spin" />}
+                        {submitState === "submitting" && <IconLoaderQuarter className="animate-spin" />}
                         {submitState === "submitted" && <IconCheck />}
-                       
-                        {/* {isSubmitting && <Loader2Icon className="animate-spin" />} */}
+
+                        {/* {isSubmitting && <IconLoaderQuarter className="animate-spin" />} */}
 
                         {submitState === "submitted" ? "Bounty Posted" : "Post Bounty"}
 
@@ -172,7 +182,7 @@ export default function PostBounty(props: PostBountyProps) {
 
                     <DialogClose asChild>
                         <Button type="button" variant="secondary">
-                           {submitState ==="submitted" ? "Done" : "Cancel"} 
+                            {submitState === "submitted" ? "Done" : "Cancel"}
                         </Button>
                     </DialogClose>
                 </DialogFooter>

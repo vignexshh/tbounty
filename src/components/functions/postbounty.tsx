@@ -19,6 +19,8 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { IconBrandTelegram, IconCheck } from "@tabler/icons-react";
 import { Loader2Icon } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 
 type PostBountyProps = {};
 
@@ -44,15 +46,24 @@ export default function PostBounty(props: PostBountyProps) {
 
         setSubmitState("submitting");
         try {
-            await fetch("/api/post/submit-bounty", {
-            method: "POST",
-            body: formData,
+            const response = await fetch("/api/post/submit-bounty", {
+                method: "POST",
+                body: formData,
             });
+
+            if (!response.ok) {
+                setTimeout(() => setSubmitState("error"), 2000)
+                // setSubmitState("error");
+                return;
+            }
+
+
             setTimeout(() => setSubmitState("submitted"), 2000)
 
             // setSubmitState("submitted");
             // setTimeout(() => setSubmitState("idle"), 3300);
         } catch (error) {
+            console.error("Failed to submit bounty:", error);
             setSubmitState("error"); // or add error state if needed
         }
     };
@@ -60,20 +71,17 @@ export default function PostBounty(props: PostBountyProps) {
 
 
     return (
-        <Dialog 
+        <Dialog
             onOpenChange={open => {
-                if (!open){
-
-                    setSubmitState('idle')
-
-
+                if (!open) {
+                    setTimeout(() => setSubmitState("idle"), 1000)
                 }
             }}>
 
             <DialogTrigger asChild>
                 <Button>Post Bounty</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className={`sm:max-w-md ${submitState === "error" ? "shake" : ""}`}>
                 <DialogHeader>
                     <DialogTitle>List a New Bounty</DialogTitle>
                     <DialogDescription>
@@ -89,6 +97,7 @@ export default function PostBounty(props: PostBountyProps) {
                             id="bountyTitle"
                             placeholder="eg. Design a shopping bag artwork"
                             value={bountytitle}
+                            minLength={20}
                             onChange={e => { setBountyTitle(e.target.value); setSubmitState("idle"); }}
 
                         />
@@ -99,7 +108,8 @@ export default function PostBounty(props: PostBountyProps) {
                         </Label>
                         <Textarea placeholder="Bounty Description goes here"
                             value={description}
-                            onChange={e => {setDescription(e.target.value); setSubmitState("idle")}} />
+                            minLength={40}
+                            onChange={e => { setDescription(e.target.value); setSubmitState("idle") }} />
                     </div>
 
                     <div className="grid gap-3">
@@ -109,13 +119,13 @@ export default function PostBounty(props: PostBountyProps) {
                         <Input
                             id="bountyPrice"
                             type="number"
-                            step="0.01"
-                            min={10}
+                            step="80.00"
+                            min={400}
                             max={100000}
                             placeholder="Enter amount in INR"
                             inputMode="decimal"
                             value={price}
-                            onChange={e => {setPrice(e.target.value); setSubmitState("idle")}}
+                            onChange={e => { setPrice(e.target.value); setSubmitState("idle") }}
                         />
                     </div>
 
@@ -131,24 +141,38 @@ export default function PostBounty(props: PostBountyProps) {
               />
 
             </div> */}
+                    {submitState === "error" && (<Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Failed to post</AlertTitle>
+                        <AlertDescription>
+                            Something went wrong, please try again later
+                        </AlertDescription>
+
+
+                    </Alert>)}
 
                 </div>
-                <DialogFooter className="sm:justify-start">
+                <DialogFooter className="sm:justify-start flex flex-row gap-2">
+
                     <Button
                         onClick={e => { setIsSubmitting(true); handleSubmit(e); }}
-                        disabled={!bountytitle || !description || !price  || submitState === "submitted" }
+                        disabled={!bountytitle || !description || !price || submitState === "submitted"}
                     >
-                        {submitState === "idle" && <IconBrandTelegram />}
+                        {(submitState === "idle" || submitState === "error") && <IconBrandTelegram />}
                         {submitState === "submitting" && <Loader2Icon className="animate-spin" />}
-                        {submitState === "submitted" && <IconCheck/>}
+                        {submitState === "submitted" && <IconCheck />}
+                       
                         {/* {isSubmitting && <Loader2Icon className="animate-spin" />} */}
 
                         {submitState === "submitted" ? "Bounty Posted" : "Post Bounty"}
-                        
+
                     </Button>
+
+
+
                     <DialogClose asChild>
                         <Button type="button" variant="secondary">
-                            Cancel
+                           {submitState ==="submitted" ? "Done" : "Cancel"} 
                         </Button>
                     </DialogClose>
                 </DialogFooter>
